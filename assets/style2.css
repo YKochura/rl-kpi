@@ -108,6 +108,10 @@ strong {
     font-size: 0.4em;
 }
 
+.larger-x {
+    font-size: 44pt;
+}
+
 .katex {
     color: #356aaf;
 }
@@ -428,15 +432,15 @@ td {
 
 /* Specials ----------------------------------------------------------------- */
 
- .title-slide: {
+.title-slide:after{
     content: '';
     background: url("../assets/logo.png") no-repeat;
-    background-size: 60% 60%;
-    width: 120px;
-    height: 120px;
+    background-size: 100% 100%;
+    width: 150px;
+    height: 73px;
     position: absolute;
-    top: 1.5em;
-    left: 5em;
+    bottom: 2em;
+    left: 3.3em;
     display: inline-block;
 }
 
@@ -445,7 +449,7 @@ td {
 }
 
 .end-slide {
-    background-color: #1452a3;
+    background-color: #a1ae1d;
     color: white;
     vertical-align: middle;
 }
@@ -460,6 +464,16 @@ td {
     background-color: red;
     color: white;
     border-top: solid 0px;
+}
+
+.blue-slide {
+    background-color: #0db9d1;
+    color: white;
+    border-top: solid 0px;
+}
+
+.gray-t {
+    color: #dcdedf;
 }
 
 .logo-im { 

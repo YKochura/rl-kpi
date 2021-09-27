@@ -435,7 +435,7 @@ td {
 .title-slide:after{
     content: '';
     background: url("../assets/logo.png") no-repeat;
-    background-size: 80% 80%;
+    background-size: 70% 70%;
     width: 220px;
     height: 220px;
     position: absolute;

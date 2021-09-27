@@ -10,7 +10,7 @@
 
 | Дата | Тема |
 | --- | --- |
-| 9 вересня | [Course syllabus](https://ykochura.github.io/rl-kpi/?p=course-syllabus.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/course-syllabus.pdf)] <br>Лекція 0: [Вступ](https://ykochura.github.io/rl-kpi/?p=lecture0.md) [[PDF](https://ykochura.github.io/pdf/rl-kpi/lecture0.pdf)]|
+| 9 вересня | [Course syllabus](https://ykochura.github.io/rl-kpi/?p=course-syllabus.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/course-syllabus.pdf)] <br>Лекція 0: [Вступ](https://ykochura.github.io/rl-kpi/?p=lecture0.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/lecture0.pdf)]|
 | 23 вересня | Лекція 1: [Вступ (частина 2)](https://ykochura.github.io/rl-kpi/?p=lecture1.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/lecture1.pdf)]|
 
 ## Практичні

@@ -10,16 +10,6 @@ class: middle, center, title-slide
 <a href="https://t.me/y_kochura">@y_kochura</a> <br>
 
 
-
-
-<img src="../assets/logo.png" alt="d" style= "background-size: 60% 60%;
-    width: 120px;
-    height: 120px;
-    position: absolute;
-    top: 1.5em;
-    left: 5em;
-    display: inline-block;"/> 
-
 ???
 
 R: https://www.cs.toronto.edu/~duvenaud/courses/csc2541/index.html projects

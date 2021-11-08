@@ -20,6 +20,7 @@
 ## Практичні
 
 - [Практична #1](https://ykochura.github.io/rl-kpi/homeworks/practice1.pdf): Перевернутий маятник (Cartpole), понг (Pong) та MountainCar.
+- [Практична #2](https://ykochura.github.io/rl-kpi/homeworks/lab2/lab2.pdf): Задача про N-рукого бандита.
 
 
 

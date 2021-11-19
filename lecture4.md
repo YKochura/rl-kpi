@@ -506,16 +506,10 @@ class: middle
 class: blue-slide, middle, center
 count: false
 
-.larger-x[Демо]
+.larger-x[[Демо](https://github.com/YKochura/rl-kpi/blob/main/tutor/mf-prediction/RL_Model_Free_Prediction.ipynb)]
 
 ---
 
-class: middle, center
-count: false
-
-.larger-x[[Демо]()]
-
----
 
 
 class: end-slide, center

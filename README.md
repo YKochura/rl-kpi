@@ -16,7 +16,7 @@
 | 4 листопада | Лекція 3: [Планування за допомогою динамiчного програмування](https://www.youtube.com/watch?v=Nd1-UUMVfz4&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3) [[David Silver](https://www.davidsilver.uk/)]| Динамічне програмування [[ipynb](https://colab.research.google.com/github/YKochura/rl-kpi/blob/main/tutor/dp/Dynamic_Programming.ipynb)] [[PDF](https://ykochura.github.io/rl-kpi/tutor/dp/DPvsMonte-Carlo.pdf)]|
 | 18 листопада | Лекція 4: [Безмодельне передбачення](https://ykochura.github.io/rl-kpi/?p=lecture4.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/lecture4.pdf)] | Безмодельне передбачення [[ipynb](https://github.com/YKochura/rl-kpi/blob/main/tutor/mf-prediction/RL_Model_Free_Prediction.ipynb)]|
 | 03 грудня | Лекція 5: [Методи апроксимацiї функцiї цiнностi](https://ykochura.github.io/rl-kpi/?p=lecture5.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/lecture5.pdf)] | Neural Fitted Q (NFQ) [[need-adapt-colab](https://github.com/YKochura/rl-kpi/blob/main/tutor/nfq/nfq.ipynb)] [[ipynb](https://github.com/YKochura/rl-kpi/blob/main/tutor/nfq/nfq-s.ipynb)] |
-| 17 грудня | Незабаром | |
+| 17 грудня | Лекція 6: [Методи градієнту стратегії](https://ykochura.github.io/rl-kpi/?p=lecture6.md) [[PDF](https://ykochura.github.io/rl-kpi/pdf/lecture6.pdf)]| Policy-gradient and actor-critic methods [[ipynb](https://github.com/YKochura/rl-kpi/blob/main/tutor/Policy_gradient_and_actor_critic_methods.ipynb)] |
 
 
 ## Практичні

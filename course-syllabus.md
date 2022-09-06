@@ -110,7 +110,7 @@ class: middle
 
 .grid[
 .kol-1-2[
-[.center.width-100[![](figures/course-syllabus/RL.png)]](http://incompleteideas.net/book/the-book-2nd.html)
+[.center.width-80[![](figures/course-syllabus/RL.png)]](http://incompleteideas.net/book/the-book-2nd.html)
 .center[Безкоштовна]
 ]
 

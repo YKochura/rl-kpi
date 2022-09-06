@@ -109,6 +109,10 @@ strong {
 }
 
 .larger-x {
+    font-size: 20pt;
+}
+
+.larger-xx {
     font-size: 44pt;
 }
 

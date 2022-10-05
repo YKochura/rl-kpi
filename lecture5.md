@@ -380,6 +380,16 @@ class: middle
 
 ---
 
+class: middle
+
+# Ітеративна оцінка стратегії
+
+.center.width-80[![](figures/lec5/ip2.png)]
+
+.footnote[Джерело: R. S. Sutton and A. G. Barto: Reinforcement Learning: An Introduction]
+
+---
+
 
 
 class: blue-slide, middle, center

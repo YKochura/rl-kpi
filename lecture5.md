@@ -466,7 +466,7 @@ count: false
 
 .larger-xx[Приклад]
 
-[[Динамiчне програмування vs Монте-Карло](https://github/YKochura/rl-kpi/blob/tutor/dp/DPvsMonte-Carlo.pdf)]
+[[Динамiчне програмування vs Монте-Карло](https://github.com/YKochura/rl-kpi/blob/main/tutor/dp/DPvs%20Monte-Carlo.pdf)]
 
 ---
 

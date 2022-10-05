@@ -461,6 +461,16 @@ DP може бути непрактичним для дуже великих п�
 ---
 
 
+class: blue-slide, middle, center
+count: false
+
+.larger-xx[Приклад]
+
+[[Динамiчне програмування vs Монте-Карло](https://github/YKochura/rl-kpi/blob/tutor/dp/DPvsMonte-Carlo.pdf)]
+
+---
+
+
 # Література
 
 .smaller-x[

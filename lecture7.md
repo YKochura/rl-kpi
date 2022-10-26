@@ -472,6 +472,10 @@ class: middle,
 ???
 Незважаючи на те, що NFQ далекий від найсучаснішого методу глибинного навчання з підкріпленням, який заснованого на функції цінності, у дещо спрощеному середовищі, такому як перевернутий маятник на візку, NFQ показує гідну продуктивність.
 
+1. Один цікавий момент полягає в тому, що ви бачите, що винагорода під час навчання ніколи не досягає максимуму в 500 за епізод. Причина в тому, що ми використовуємо епсилон 0.5. Наявність такого високого рівня дослідження допомагає знаходити точніше функцію цінності, але показує гіршу продуктивність під час навчання.
+2. На другому рисунку подано середню винагороду під час етапу валідації. Етап валідації показує нам найкращою продуктивністю, яку ми можемо отримати від агента.
+3. Основна проблема з NFQ полягає в тому, що потрібно зробити занадто багато кроків, щоб отримати гідну продуктивність. Іншими словами, з точки зору ефективності вибірки, NFQ працює погано. Щоб отримати хороші результати, потрібно багато зразків. Він не отримує максимум від кожного зразка.
+
 ---
 
 
@@ -490,6 +494,7 @@ count: false
 - [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/RLbook2018.pdf) - Chapter 9: On-policy Prediction with Approximation
 - [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/RLbook2018.pdf) - Chapter 10: On-policy Control with Approximation
 - [Tutorial: Introduction to Reinforcement Learning with Function Approximation](https://www.youtube.com/watch?v=ggqnxyjaKe4)
+- [Neural Fitted Q Iteration - First Experiences with a Data Eﬃcient Neural Reinforcement Learning Method](https://github.com/YKochura/rl-kpi/blob/main/tutor/nfq/paper.pdf)
 
 ]
 

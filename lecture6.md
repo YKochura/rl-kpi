@@ -543,4 +543,5 @@ class: end-slide, center
 
 .smaller-x[
 - David Silver, [Lecture 4: Model-Free Prediction](https://www.youtube.com/watch?v=PnHCvfgC_ZA&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=6)
+- Steve Brunton, [Q-Learning: Model Free Reinforcement Learning and Temporal Difference Learning](https://www.youtube.com/watch?v=0iqz4tcKN58)
 ]

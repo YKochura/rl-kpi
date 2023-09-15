@@ -2,7 +2,7 @@ class: middle, center, title-slide
 
 # Навчання з підкріпленням
 
-Лекція 2: Згорткові мережі
+Лекція 2: Марковськi процеси прийняття рiшень
 
 <br><br>
 Кочура Юрій Петрович<br>
@@ -11,701 +11,794 @@ class: middle, center, title-slide
 
 
 ---
-class: middle,
+
+class: middle
+
 # Сьогодні
 
-Розуміння згорткових нейронних мереж (*convnets* або *СNNs*)
+- Марковські процеси 
+- Марковські процеси винагороди 
+- Марковські процеси прийняття рішень (МППР)
 
-- Повнозв'язна vs згорткова мережа
-- Операція згортки
-- Крок згортки
-- Ефект доповнення (padding)
-- Операція агрегації (pooling)
+---
+
+
+class: middle
+
+# Цикл взаємодії
+
+.center[
+.width-70[![](figures/lec3/drl.png)]
+]
+
+*Мета* &mdash; максимізувати загальну винагороду, отриману агентом при взаємодії з навколишнім середовищем.
+
+???
+Алгоритм навчання з підкріпленням по суті створює агента, який діє у певному середовищі. Це середовище часто є грою, але загалом це будь-який процес, що продукує стани та винагороди. Агент має доступ до поточного стану середовища, тобто всіх даних про середовище в певний момент часу, $s\_t \in S$. Використовуючи інформацію про цей стан, агент здійснює дію $a\_t \in A$, яка може детерміновано або стохастично перевести агента у новий стан $s\_{t+1}$
+
+---
+
+class: middle
+
+# Вступ до МППР
+
+- Марковські процеси прийняття рішень формально описують середовище для навчання з підкріпленням
+- Там, де середовище є повністю оглядовим
+- Поточний стан агента повністю характеризує процес
+- Майже всі задачі RL можна формалізувати як МППР
+    - Оптимальне управління насамперед стосується безперервних МППР
+    - Задачі в частково оглядовому середовищі можуть бути зведені до МППР
+
+???
+Здатність агента обирати найкращу дію, перебуваючи у деякому стані $s$, без врахування минулого (попередніх станів) є важливою властивістю для навчання з підкріпленням, яка називається властивістю Маркова. Гра або будь-яка інша задача з оптимального управління, що володіє властивістю Маркова, називається Марківським процесом прийняття рішень (МППР). Термін Марковська властивість позначає відсутності пам'яті в стохастичного процесу. Іншими словами, «майбутнє» процесу залежить лише від поточного стану агента, і не залежить від більш ранніх станів. 
+
+У МППР поточний стан агента містить достатньо інформації для вибору оптимальних дій, щоб максимізувати майбутні винагороди. Моделювання задач з оптимального управління як МППР є ключовою концепцією для навчання з підкріпленням, оскільки це значно спрощує задачу RL, так як нам не потрібно враховуючи всі попередні стани чи дії агента - нам не потрібно мати пам’ять, агенту просто потрібно проаналізувати нинішню ситуацію. 
+
+---
+
+class: middle
+
+# Властивість Маркова
+
+.success[Майбутнє процесу не залежить від минулого, а залежить лише від поточного стану]
+
+Стан $S\_t$ є Марковським тоді і тільки тоді
+
+$$\boxed{\mathbb{P}[S\_{t + 1} | S\_{t}] = \mathbb{P}[S\_{t + 1} | S\_1, \cdots, S\_{t}]}$$
+
+- Це означає, що поточний стан агента містить все, що нам потрібно знати з його історії
+
+- Як тільки стан стане відомим, історію можна буде відкинути
+
+- Тобто, стан &mdash; це достатня статистика для майбутнього 
+
+---
+
+class: middle
+count: false
+
+# Властивість Маркова
+
+.smaller-xx[Щоб перевірити своє розуміння властивості Маркова, розглянемо декілька задач управління або задач прийняття рішень і подивимось, які з них володіють властивістю Маркова: ]
+
+- Водіння автомобіля 
+- Рішення інвестувати в акції чи ні
+- Вибір лікування пацієнта
+- Діагностика хвороби пацієнта
+- Передбачити, яка команда виграє у футбольному матчі
+- Пошук найкоротшого маршруту (найкоротшого) до певного пункту призначення 
+- Наведення прицілу гармати на постріл у далеку мішень
+
+???
+Задача водіння автомобіля володіє властивістю Маркова, оскільки Вам не потрібно знати, що сталося 10 хв тому, щоб мати можливість оптимально керувати автомобілем. Вам просто потрібно володіти поточною ситуацією на дорозі і те, куди хочете доїхати.
+
+Задача з інвестування в ації не володіє властивістю Маркова, оскільки Вам потрібно знати якусь інформацію про діяльності компанії в яку Ви хочете інвестувати та попередню вартість акцій, щоб прийняти заздалегідь прийнятне рішення.
+
+Вибір медичного лікування, схоже, має властивість Маркова, тому що Вам не потрібно знати біографію людини, щоб вибрати хороше лікування для того, щоб усунути існуючу проблему.
+
+І навпаки, діагностика, безумовно, вимагає знання минулих станів. Часто дуже важливо знати історичний перебіг симптомів у пацієнта, щоб поставити правильний діагноз.
+
+Передбачення того, яка футбольна команда виграє, не має властивості Маркова, оскільки, як і у прикладі з акціями, вам потрібно знати минулі результати діяльності футбольних команд, щоб зробити хороший прогноз. 
+
+Вибір найкоротшого маршруту до пункту призначення має властивість Маркова, тому що вам просто потрібно знати відстань до пункту призначення для різних маршрутів, що не залежить від того, куди Ви їздили і де перебували до цього моменту. 
+
+Наведення прицілу гармати на постріл у далеку мішень також має властивість Маркова, оскільки все, що вам потрібно знати, це місце, де знаходиться мішень і, можливо, поточні умови, такі як швидкість вітру та особливості вашої гармати. Вам не потрібно знати швидкість вітру вчора.   
+
+---
+
+class: middle, 
+
+## Матриця зміни стану (state transition matrix)
+
+Ймовірність переходу між Марковськими станами $s \rightarrow s^\prime$, визначається так:
+
+$$\boxed{\mathcal{P}\_{ss^\prime} = \mathbb{P}[S\_{t + 1} = s^\prime | S\_{t} = s]}$$
+
+Матриця зміни стану $\mathcal{P}$ визначає ймовірності переходу між усіма станами $s$ у всі можливі стани $s^\prime$:
+
+$$\mathcal{P} =
+\begin{bmatrix}
+\mathcal{P}\_{11} & \cdots &  \mathcal{P}\_{1n}\\\\
+\vdots & & \\\\
+\mathcal{P}\_{n1} & \cdots &  \mathcal{P}\_{nn}
+\end{bmatrix},$$
+
+де кожен рядок матриці у сумі дорівнює 1.
+
+???
+Ймовірність, яка пов'язана з переходом агента з одного стану в інший, шляхом виконання дії, називається ймовірністю переходу (transition probability). Агент отримує винагороду $R\_t$ за виконану дію $A\_t$ у стані $S\_t$, що переводить агента до нового стану, $S\_{t + 1}$.   
+
+---
+
+class: middle
+
+# Марковський процес
+
+**Марковський процес** &mdash; це випадковий процес у якого відсутня пам'ять, тобто послідовність випадкових станів $S\_1, S\_2, \cdots$, які володіють властивістю Маркова.
+
+Марківський процес (або ланцюг Маркова) &mdash; це кортеж $\langle\mathcal{S}, \mathcal{P}\rangle$:
+
+- $\mathcal{S}$  &mdash; скінченнa множинa станів
+- $\mathcal{P}$ &mdash; матриця зміни стану: $\mathcal{P}\_{ss^\prime} = \mathbb{P}[S\_{t + 1} = s^\prime | S\_{t} = s]$
+---
+
+class: blue-slide, middle, center
+count: false
+
+.larger-xx[Приклад]
+
+---
+
+
+class: middle
+
+# Студентський ланцюг Маркова
+
+.center[
+.width-80[![](figures/lec4/smc.png)]
+]
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Студентський ланцюг Маркова
+
+.grid[
+.center.kol-1-2[
+.width-100[![](figures/lec4/smc.png)]
+]
+
+.smaller-xx.kol-1-2[ 
+Початковий *епізод* починається з $S\_1 = C\_1$
+$$S\_1, S\_2, \cdots, S\_T$$
+
+- C1 C2 C3 Pass Sleep
+- C1 FB FB C1 C2 Sleep
+- C1 C2 C3 Pub C2 C3 Pass Sleep
+- C1 FB FB C1 C2 C3 Pub C1 FB FB FB C1 C2 C3 Pub C2 Sleep
+]
+]
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Студентський ланцюг Маркова: матриця зміни стану
+
+
+.center.width-50[![](figures/lec4/smc.png)]
+
+
+
+.smaller-xx[$$\mathcal{P} =
+\begin{array}{c}
+\\\\
+C1 \\\\
+C2 \\\\
+C3 \\\\
+Pass \\\\
+Pub \\\\
+FB \\\\
+Sleep
+\end{array}
+\begin{matrix}
+C1 & C2 &  C3 & Pass & Pub & FB & Sleep \\\\
+ & 0.5 &  & & & 0.5 &\\\\
+ &  & 0.8 & & &  & 0.2\\\\
+ &  &  & 0.6 & & 0.4 & \\\\
+ &  &  &  & &  & 1.0\\\\
+ 0.2 & 0.4 & 0.4 &  & &  & \\\\
+ 0.1 &  &  &  & & 0.9 & \\\\
+  &  &  &  & &  & 1
+\end{matrix}$$
+]
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
 class: blue-slide, middle, center
 count: false
 
-.larger-xx[Повнозв'язна мережа]
+.larger-xx[Марковські процеси винагороди]
 
 ---
 
 class: middle
 
-# MNIST: приклади
+Марковський процес винагороди &mdash; ланцюг Маркова з винагородою.
 
-.center.width-100[![](figures/lec2/mnist-samples.png)]
+Марковський процес винагороди &mdash; це кортеж $\langle\mathcal{S}, \mathcal{P}, \red{\mathcal{R}, \red{\gamma}}\rangle$:
 
-.success[**Примітка!** У машинному навчанні для задачі класифікації категорія даних називається *класом*. Кожна одиниця даних називається
-прикладом. Клас, який пов’язаний із певним прикладом називається *міткою (label)*.]
+- $\mathcal{S}$  &mdash; скінченнa множинa станів
+- $\mathcal{P}$ &mdash; матриця зміни стану: $\mathcal{P}\_{ss^\prime} = \mathbb{P}[S\_{t + 1} = s^\prime | S\_{t} = s]$
+- $\red{\mathcal{R}}$ &mdash; .red[функція винагороди]: $\red{\mathcal{R}\_s = \mathbb{E}[R\_{t+1} | S\_{t} = s]}$ 
+- $\red{\gamma}$ &mdash; .red[коефіцієнт знецінювання], $\red{\gamma \in [0, 1]}$
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
+---
+
+class: middle
+
+# Приклад: МПВ
+
+.center.width-80[![](figures/lec4/mrp.png)]
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Загальна винагорода
+
+Загальна винагорода &mdash; сумарна винагорода отримана агентом з моменту часу $t$ з урахування знецінювання:
+
+$$\boxed{G\_t = R\_{t+1} + \gamma R\_{t+2}  + \cdots = \sum\_{k=0}^{\infty} \gamma^{k} R\_{t+k+1}}$$
+
+- Коефіцієнт знецінювання $\gamma \in [0, 1]$ визначає цінність майбутніх винагород
+- Значення винагороди $R$, отримане після $k+1$ кроків: $\gamma^{k} R$
+- Чим менший коефіцієнт знецінювання, тим менше агент замислюється над вигодою від майбутніх своїх дій.
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Яка роль знецінювання?
+
+- Дозволяє уникнути нескінченної загальної винагороди в циклічних марківських процесах
+- Невизначеність щодо майбутнього може бути представлена не повністю 
+- Якщо винагорода є фінансовою, миттєва винагорода може бути більш цікавою, ніж відтермінована 
+- Поведінка тварин/людини демонструє перевагу миттєвій винагороді
+- Іноді можна використовувати марковський процес винагороди без знецінювання(тобто $\gamma = 1$), наприклад якщо всі послідовності закінчуються. 
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Функція цінності
+
+Функція цінності $v(s)$ показує довгострокову цінність перебування агента у стані $s$
+
+Функція цінності $v(s)$ марковського процесу винагороди &mdash; середнє значення загальної винагороди починаючи від стану $s$
+
+$$\boxed{\begin{aligned}
+v(s) &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma R\_{t+2} + \gamma^2 R\_{t+3} + \cdots  \ | \ S\_t = s]
+\end{aligned}}$$
+
+---
+
+class: middle
+
+## Приклад: МПВ загальна винагорода
+Покачок з $S\_1 = C\_1$ з $\gamma = \frac{1}{2}$
+
+.center.width-40[![](figures/lec4/mrp.png)] 
+
+$$G\_1 = R\_2 + \gamma R\_3 + \cdots + \gamma^{T-2} R\_T$$ 
+
+.center.width-100[![](figures/lec4/vs.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Приклад: Функція цінності 
+
+
+.center.width-80[![](figures/lec4/g0.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Приклад: Функція цінності 
+
+
+.center.width-80[![](figures/lec4/g09.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Приклад: Функція цінності 
+
+
+.center.width-80[![](figures/lec4/g1.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Рівняння Беллмана для МПВ 
+
+
+$$\boxed{\begin{aligned}
+v(s)  &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma R\_{t+2} + \gamma^2 R\_{t+3} + \cdots  \ | \ S\_t = s] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma (R\_{t+2} + \gamma R\_{t+3} + \cdots ) \ | \ S\_t = s] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma G\_{t + 1} \ | \ S\_t = s] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} +  \gamma v(S\_{t + 1})  \ | \ S\_t = s]
+\end{aligned}}$$
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Рівняння Беллмана: усереднення 
+
+$$v(s) = \mathop{\mathbb{E}}\ [R\_{t+1} +  \gamma v(S\_{t + 1})  \ | \ S\_t = s]$$
+
+
+.center.width-40[![](figures/lec4/tr.png)]
+
+
+$$v(s) =\mathcal{R}\_s +  \gamma \sum\_{s^\prime \in \mathcal{S}} \mathcal{P}\_{ss^\prime} v(s^\prime)$$
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Приклад усереднення рівняння Беллмана
+
+.center.width-70[![](figures/lec4/eb.png)]
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Матрична форма рівняння Беллмана
+
+Рівняння Беллмана можна виразити у матричній формі:
+
+$$v =\mathcal{R} +  \gamma \mathcal{P} v,$$
+
+де $v$ &mdash; вектор-стовпець з одним записом для кожного стану. 
+
+
+$$\begin{aligned}
+\begin{bmatrix}
+v(1) \\\\
+\vdots \\\\
+v(n) 
+\end{bmatrix} 
+= \begin{bmatrix}
+\mathcal{R}\_1 \\\\
+\vdots \\\\
+\mathcal{R}\_n 
+\end{bmatrix}  + \gamma
+\begin{bmatrix}
+\mathcal{P}\_{11} & \cdots &  \mathcal{P}\_{1n}\\\\
+\vdots & & \\\\
+\mathcal{P}\_{n1} & \cdots &  \mathcal{P}\_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+v(1) \\\\
+\vdots \\\\
+v(n) 
+\end{bmatrix}
+\end{aligned}$$
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Розв'язок рівняння Беллмана
+
+- Рівняння Беллмана є лінійним рівнянням
+- Його можна розв'язати точними методами (алгебраїчним способом):
+
+$$\begin{aligned}
+v &=\mathcal{R} +  \gamma \mathcal{P} v \\\\
+v(1 - \gamma \mathcal{P}) &= \mathcal{R} \\\\
+v &= (1 - \gamma \mathcal{P})^{-1} \mathcal{R}
+\end{aligned}$$
+
+- Обчислювальна складність становить $O(n^3)$ для $n$ станів 
+- Алгебраїчний спосіб розв'язку можливий лише для малих МПВ ($n \sim 10^4$)
+- Існує багато ітераційних методів для великих МПВ ($n \sim 10^7$)
+    - Динамічне програмування
+    - Оцінка Монте-Карло 
+    - Навчання часових різниць
 
 ???
-We’re about to dive into the theory of what convnets are and why they have been so successful at computer vision tasks. But first, let’s take a practical look at a densely connected network example that classifies MNIST digits. Don’t worry if some steps seem arbitrary or look like magic to you! We’ve got to start somewhere.
+У динамічному програмуванні для керованого процесу серед множини усіх допустимих рішень шукають оптимальне у сенсі деякого критерію тобто таке яке призводить до екстремального (найбільшого або найменшого) значення цільової функції — деякої числової характеристики процесу.
+ 
+Оцінка Монте-Карло. В алгоритмі, який імітує ітерацію за стратегіями, можуть застосовуватися найпростіші методи Монте-Карло. Ітерація за стратегіями складається з двох кроків: оцінки стратегії (англ. policy evaluation) та вдосконалення стратегії (англ. policy improvement). Методи Монте-Карло використовуються на кроці оцінки стратегії. На цьому кроці метою є для заданої постійної детерміністичної стратегії $\pi$  обчислити значення функції $q^{\pi}(s, a)$ (або її добре наближення) для всіх пар стан-дія $(s, a)$.
 
-The problem we’re trying to solve here is to classify grayscale images of handwritten digits (28 × 28 pixels) into their 10 categories (0 through 9). We’ll use the MNIST dataset, a classic in the machine learning community, which has been around almost as long as the field itself and has been intensively studied. It’s a set of 60,000 training images, plus 10,000 test images, assembled by the National Institute of Standards and Technology (the NIST in MNIST) in the 1980s. You can think of “solving” MNIST as the “Hello World” of deep learning &mdash; it’s what you do to verify that your algorithms are working as expected. As you become a machine learning practitioner, you’ll see MNIST come up over and over again in scientific papers, blog posts, and so on. You can see some MNIST samples
-on this slide.
-
----
-
-class: middle
-
-# Імпортування набору даних MNIST у Keras
-
-.center.width-100[![](figures/lec2/load-mnist-keras.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-- *train_images* та  *train_labels* &mdash; навчальний набір даних (дані на яких
-модель буде навчатись)
-
--  *test_images* та *test_labels* &mdash; тестовий набір (дані на яких буде оцінено продуктивність моделі)
-
-???
-The MNIST dataset comes preloaded in Keras, in the form of a set of four NumPy arrays.
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
-
-class: middle
-
-# Навчальний набір
-
-.center.width-100[![](figures/lec2/train-data.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-
-???
-The images are encoded as NumPy arrays, and the labels are an array of digits, ranging from 0 to 9. The images and labels have a one-to-one correspondence.
-
----
-
-class: middle
-
-# Тестовий набір
-
-.center.width-100[![](figures/lec2/test-data.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
----
-
-class: middle
-
-# Архітектура мережі
-
-.center.width-90[![](figures/lec2/dense-net-arch.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-Робочий процес буде таким: спочатку ми передамо нейронній мережі навчальні дані *train_images* та *train_labels*. Таким чином мережа навчиться пов’язувати зображення з мітками. Потім ми попросимо мережу створити прогнози для *test_images* та перевіримо, чи відповідають ці прогнози міткам з *test_labels*.
-
-???
-The core building block of neural networks is the *layer*. You can think of a layer as a filter for data: some data goes in, and it comes out in a more useful form. Specifically, layers extract representations out of the data fed into them &mdash; hopefully, representations that are more meaningful for the problem at hand. Most of deep learning consists of chaining together simple layers that will implement a form of progressive data distillation. A deep learning model is like a sieve for data processing, made of a succession of increasingly refined data filters &mdash; the layers.
-
-Here, our model consists of a sequence of two *Dense* layers, which are densely connected (also called *fully connected*) neural layers. The second (and last) layer is a 10-way *softmax classification* layer, which means it will return an array of 10 probability scores (summing to 1). Each score will be the probability that the current digit image belongs to one of our 10 digit classes.
-
----
-
-class: middle
-
-# Готуємо мережу до навчання
-
-Щоб підготувати мережу до навчання, нам потрібно визначити на етапі *компіляції*:
-
-- *Оптимізатор* &mdash; алгоритм за допомогою якого модель оновлюватиметься на основі навчальних даних, які надаються моделі для покращеня свої продуктивності.
-
-- *Функція втрат* &mdash; спосіб виміру втрат моделі. Оптимізатор намагається мінімізувати втрати моделі.
-
-- *Метрики для моніторингу під час навчання та тестування* &mdash; у цій задачі ми слідкуватимо за точністю (відсоток зображень, які були правильно класифіковані).
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
----
-
-class: middle
-
-# Компіляція моделі
-
-.center.width-100[![](figures/lec2/dense-model-compile.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
----
-
-
-class: middle
-
-# Підготовка даних
-
-.center.width-90[![](figures/lec2/image-preparation.png)]
-
-Раніше наші навчальні зображення зберігалися в масиві форми *(60000, 28, 28)* типу **uint8** зі значеннями в інтервалі *[0, 255]*. Ми
-перетворимо його на масив **float32** форми *(60000, 28 ∗ 28)* зі значеннями від *0* до *1*.
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Before training, we’ll preprocess the data by reshaping it into the shape the model expects and scaling it so that all values are in the $[0, 1]$ interval.
-
-We’re now ready to train the model, which in Keras is done via a call to the model’s *fit()* method &mdash; we fit the model to its training data. 
-
----
-
-class: middle
-
-# Навчання моделі
-
-.center.width-100[![](figures/lec2/fiting.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Two quantities are displayed during training: the loss of the model over the training data, and the accuracy of the model over the training data. We quickly reach an accuracy of 0.989 (98.9%) on the training data. Now that we have a trained model, we can use it to predict class probabilities for new digits &mdash; images that weren’t part of the training data, like those from the test set.
-
----
-
-class: middle
-
-# Виконання прогнозу
-
-.center.width-100[![](figures/lec2/testing-model.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-Кожне індекс $i$ в цьому масиві відповідає ймовірності того, що наше тестове зображення *test_digits[0]* належить до класу $i$.
-
----
-
-class: middle
-# Виконання прогнозу
-
-Перше тестове зображення має найбільшу ймовірність (*0.99999106*, майже 1) для індекса масива *7*, тому відповідно до цього прогнозу моделі це має
-бути *7*:
-
-.center.width-70[![](figures/lec2/test-example.png)]
-
-Перевіримо на відповідність тестовій мітці:
-
-.center.width-60[![](figures/lec2/test-example2.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-On average, how good is our model at classifying such never-before-seen digits? Let’s check by computing average accuracy over the entire test set.
-
----
-
-class: middle
-
-# Оцінка моделі на нових даних
-
-.center.width-100[![](figures/lec2/evaluate-model.png)]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-The test-set accuracy turns out to be 97.8% &mdash; that’s quite a bit lower than the training-set accuracy (98.9%). This gap between training accuracy and test accuracy is an example of overfitting: the fact that machine learning models tend to perform worse on new data than on their training data. 
-
-This concludes our first example—you just saw how you can build and train a neural network to classify handwritten digits in less than 15 lines of Python code.
-
----
-
 
 
 class: blue-slide, middle, center
 count: false
 
-.larger-xx[Згорткові мережі]
-
-???
-We’re about to dive into the theory of what convnets are and why they have been so successful at computer vision tasks. But first, let’s take a practical look at a simple convnet example that classifies MNIST digits, a task we performed above using a densely connected network (our test accuracy then was 97.8%). Even though the convnet will be basic, its accuracy will blow our densely connected model out of the water.
-
----
-
-
-class: middle
-
-# Створюємо згорткову мережу
-
-.center.width-100[![](figures/lec2/small-convnet.png)]
-
-.smaller-xx[Важливо, що convnet приймає на вхід тензори форми *(image_height, image_width, image_channels)*, не включаючи розмірність пакету. У цьому випадку ми налаштуємо convnet для обробки вхідних даних розміром $(28, 28, 1)$, що відповідає формату зображень MNIST.]
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-The following listing shows what a basic convnet looks like. It’s a stack of *Conv2D* and *MaxPooling2D* layers. You’ll see in a minute exactly what they do. We’ll build the model using the Functional API.
-
-Let’s display the architecture of our convnet.
+.larger-xx[Марковські процеси прийняття рішень (МППР)]
 
 ---
 
 class: middle
 
-# Summary
+## МППР
 
-.center.width-90[![](figures/lec2/model-summary.png)]
+Марковський процес прийняття рішень (МППР) &mdash; марковський процес винагороди з рішеннями (прийнятими діями). Це середовище, у якому всі стани є марковськими. 
 
+МППР &mdash; це кортеж $\langle\mathcal{S}, \red{\mathcal{A}}, \mathcal{P}, \mathcal{R}, \gamma\rangle$:
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-You can see that the output of every *Conv2D* and *MaxPooling2D* layer is a rank-3 tensor of shape $(height, width, channels)$. The width and height dimensions tend to shrink as you go deeper in the model. The number of channels is controlled by the first argument passed to the Conv2D layers $(32, 64, or 128)$.
-
-After the last Conv2D layer, we end up with an output of shape (3, 3, 128) &mdash; a 3 × 3 feature map of 128 channels. The next step is to feed this output into a densely connected classifier like those you’re already familiar with: a stack of *Dense* layers. These classifiers process vectors, which are 1D, whereas the current output is a rank-3 tensor. To bridge the gap, we flatten the 3D outputs to 1D with a *Flatten* layer before adding the *Dense* layers.
-
-Finally, we do 10-way classification, so our last layer has 10 outputs and a softmax activation. Now, let’s train the convnet on the MNIST digits. We’ll reuse a lot of the code from the MNIST example in *Fully connected NNs* section. Because we’re doing 10-way classification with a softmax output, we’ll use the categorical crossentropy loss, and because our labels are integers, we’ll use the sparse version, *sparse_categorical_crossentropy*.
+- $\mathcal{S}$  &mdash; скінченнa множинa станів
+- $\red{\mathcal{A}}$ &mdash; .red[скінченнa множинa дій]
+- $\mathcal{P}$ &mdash; матриця зміни стану: $\mathcal{P}^\red{a}\_{ss^\prime} = \mathbb{P}[S\_{t + 1} = s^\prime | S\_{t} = s, \red{A\_t = a}]$
+- $\mathcal{R}$ &mdash; функція винагороди: $\mathcal{R}^\red{a}\_s = \mathbb{E}[R\_{t+1} | S\_{t} = s, \red{A\_t = a}]$ 
+- $\gamma$ &mdash; коефіцієнт знецінювання, $\gamma \in [0, 1]$
 
 ---
 
 class: middle
 
-# Підготовка даних, компіляція та навчання моделі
-
-.center.width-90[![](figures/lec2/training-convnet.png)]
+## Приклад: МППР 
 
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Let’s evaluate the model on the test data.
-
----
+.center.width-70[![](figures/lec4/mdp.png)]
 
 
-class: middle
-
-# Оцінка згорткової моделі на нових даних
-
-.center.width-90[![](figures/lec2/eval-convnet.png)]
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Whereas the densely connected model from *Fully connected NNs* section had a test accuracy of 97.8%, the basic convnet has a test accuracy of 99.1%: we decreased the error rate by about 60% (relative). Not bad!
-
-But why does this simple convnet work so well, compared to a densely connected model? To answer this, let’s dive into what the *Conv2D* and *MaxPooling2D* layers do.
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
 class: blue-slide, middle, center
 count: false
 
-.larger-xx[Будівельні блоки]
+.larger-xx[Стратегія]
 
 ---
 
-
-class: black-slide, middle
-
-# Тензор (tensor)
-
-масив чисел, розташованих у сітці зі змінною кількістю осей
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t0.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t02.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t1.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t12.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t2.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t22.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t3.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t32.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/anim-v2.gif)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/imc.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/imRGB.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/t32.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/imsec.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/imsec2.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-
-
-class: black-slide, middle
-
-# Згортка (convolution)
-
-$$\boxed{(f*g)(x) = \int f(z)g(x - z) \, dz}$$
-
-
----
 
 class: middle
 
-.center.width-100[![](figures/lec2/Comparison_convolution_correlation.png)]
+# Стратегія 
 
-.footnote[Джерело: [Вікіпедія](https://en.wikipedia.org/wiki/Convolution)]
+$$\pi(a | s) = \mathbb{P} (A\_t = a | S\_t = s)$$
 
----
-
-
-class: black-slide, middle
-
-.center.width-100[![](figures/lec2/conv-cor.png)]
-
-.footnote[Джерело: Kosta Derpanis. [Convolutional Networks](pdf/ConvNets.pdf)]
-
----
-
-class: middle
-
-# The convolution operation
-
-.center.width-50[![](figures/lec2/im.png)]
+- Стратегія повністю визначає поведінку агента
+- Стратегія у МППР залежить від поточного стану, а не від історії
+- Тобто, стратегія є стаціонарною (не залежить від часу): 
+    $A\_t \sim \pi(\cdot | S\_t), \forall t > 0$
 
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ???
-The fundamental difference between a densely connected layer and a convolution layer is this: Dense layers learn global patterns in their input feature space (for example, for a MNIST digit, patterns involving all pixels), whereas convolution layers learn local patterns &mdash; in the case of images, patterns found in small 2D windows of the inputs (see figure on this slide). In the previous example, these windows were all 3 × 3.
-
-Images can be broken into local patterns such as edges, textures, and so on.
-
----
-
-class: middle
-
-This key characteristic (convolution layers learn local patterns) gives convnets two interesting properties:
-
-- *The patterns they learn are translation-invariant.* After learning a certain pattern in the lower-right corner of a picture, a convnet can recognize it anywhere: for example, in the upper-left corner. A densely connected model would have to learn the pattern anew if it appeared at a new location. This makes convnets data-efficient when processing images (because the visual world is fundamentally translation-invariant): they need fewer training samples to learn representations that have generalization power.
-
-- *They can learn spatial hierarchies of patterns.* A first convolution layer will learn small local patterns such as edges, a second convolution layer will learn larger patterns made of the features of the first layers, and so on (see figure on next slide). This allows convnets to efficiently learn increasingly complex and abstract visual concepts, because t*he visual world is fundamentally spatially hierarchical*.
 
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
+- Стратегія &mdash; це план переходу між станом агента до дії
 
-???
-- *The patterns they learn are translation-invariant.* After learning a certain pattern in the lower-right corner of a picture, a convnet can recognize it anywhere: for example, in the upper-left corner. A densely connected model would have to learn the pattern anew if it appeared at a new location. This makes convnets data-efficient when processing images (because the visual world is fundamentally translation-invariant): they need fewer training samples to learn representations that have generalization power.
+- Детерімінована стратегія: $A = \pi(S)$
 
-- *They can learn spatial hierarchies of patterns.* A first convolution layer will learn small local patterns such as edges, a second convolution layer will learn larger patterns made of the features of the first layers, and so on (see figure on next slide). This allows convnets to efficiently learn increasingly complex and abstract visual concepts, because t*he visual world is fundamentally spatially hierarchical*.
-
----
-
-class: middle
-
-# The convolution operation
-
-.center.width-80[![](figures/lec2/cat.png)]
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-The visual world forms a spatial hierarchy of visual modules: elementary lines or textures combine into simple objects such as eyes or ears, which combine into high-level concepts such as “cat.”
-
-
-Convolutions operate over rank-3 tensors called *feature maps*, with two spatial axes (*height* and *width*) as well as a depth axis (also called the *channels* axis). For an RGB image, the dimension of the depth axis is 3, because the image has three color channels: red, green, and blue. For a black-and-white picture, like the MNIST digits, the depth is 1 (levels of gray). The convolution operation extracts patches from its input feature map and applies the same transformation to all of these patches, producing an output feature map. This output feature map is still a rank-3 tensor: it has a width and a height. Its depth can be arbitrary, because the output depth is a parameter of the layer, and the different channels in that depth axis no longer stand for specific colors
-as in RGB input; rather, they stand for *filters*. Filters encode specific aspects of the input data: at a high level, a single filter could encode the concept “presence of a face in the input,” for instance.
+- Стохастична стратегія: $\pi(a | s) = \mathbb{P} (A\_t = a | S\_t = s)$
 
 ---
 
 
 class: middle
 
-## The concept of a response map: a 2D map of the presence of a pattern at different locations in an input
+- Для заданого МППР $\mathcal{M} = \langle\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma\rangle$ та стратегії $\pi$
+- Послідовність станів $S\_1, S\_2, \cdots$ &mdash; марковський процес $\langle\mathcal{S}, \mathcal{P}^\pi\rangle$
+- Послідовність зі станів та винагород $S\_1, R\_2, S\_2, \cdots $ &mdash; марківський процес винагород $\langle\mathcal{S}, \mathcal{P}^\pi, \mathcal{R}^\pi, \gamma\rangle$ 
 
-.center.width-80[![](figures/lec2/responce-map.png)]
+$$\mathcal{P}^\pi = \sum\_{a \in \mathcal{A}} \pi(a | s) \mathcal{P}^a\_{ss^\prime}$$
 
-.smaller-xx[In the MNIST example, the first convolution layer takes a feature map of size $(28, 28, 1)$ and outputs a feature map of size $(26, 26, 32)$: it computes 32 filters over its input. Each of these 32 output channels contains a 26 × 26 grid of values, which is a response map of the filter over the input, indicating the response of that filter pattern at different locations in the input (see figure above).]
+$$\mathcal{R}^\pi = \sum\_{a \in \mathcal{A}} \pi(a | s) \mathcal{R}^a\_{s}$$
 
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
 
-???
-In the MNIST example, the first convolution layer takes a feature map of size $(28, 28, 1)$ and outputs a feature map of size $(26, 26, 32)$: it computes 32 filters over its input. Each of these 32 output channels contains a 26 × 26 grid of values, which is a response map of the filter over the input, indicating the response of that filter pattern at different locations in the input (see figure above).
-
-That is what the term feature map means: every dimension in the depth axis is a feature (or filter), and the rank-2 tensor $output[:, :, n]$ is the 2D spatial map of the response of this filter over the input.
-
----
-
-class: middle, center
-
-# Demo
-
-.larger-x[[How convolution works in a convolutional layer?](https://ml4a.github.io/demos/convolution/)]
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
 
 class: middle
 
-Convolutions are defined by two key parameters:
+# Функція цінності
 
-- *Size of the patches extracted from the inputs* &mdash; These are typically 3×3 or   5×5. In the example, they were 3 × 3, which is a common choice.
-- *Depth of the output feature map* &mdash; This is the number of filters computed by the convolution. The example started with a depth of 32 and ended with a depth of 64.
+Функція цінності $v\_{\pi}(s)$ МППР &mdash; середнє значення загальної винагороди починаючи від стану $s$ при дотриманні заданої стратегії $\pi$
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
+$$\boxed{\begin{aligned}
+v\_{\pi}(s) &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma R\_{t+2} + \gamma^2 R\_{t+3} + \cdots  \ | \ S\_t = s, \pi]
+\end{aligned}}$$
+
+Q-функція:
+
+$$\boxed{\begin{aligned}
+q\_{\pi}(s, a) &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s, A\_t = a, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma R\_{t+2} + \gamma^2 R\_{t+3} + \cdots  \ | \ S\_t = s, A\_t = a, \pi]
+\end{aligned}}$$
+
+---
+
+class: middle
+
+## Приклад функції цінності 
+
+
+.center.width-70[![](figures/lec4/vpi.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Рівняння Беллмана для МППР 
+
+
+$$\boxed{\begin{aligned}
+v\_{\pi}(s)  &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma R\_{t+2} + \gamma^2 R\_{t+3} + \cdots  \ | \ S\_t = s, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma (R\_{t+2} + \gamma R\_{t+3} + \cdots ) \ | \ S\_t = s, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma G\_{t + 1} \ | \ S\_t = s, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} +  \gamma v\_{\pi}(S\_{t + 1})  \ | \ S\_t = s, \pi]
+\end{aligned}}$$
+
+$$\boxed{\begin{aligned}
+q\_{\pi}(s, a) &= \mathop{\mathbb{E}}\ [G\_t \ | \ S\_t = s, A\_t = a, \pi] = \\\\
+&= \mathop{\mathbb{E}}\ [R\_{t+1} + \gamma q\_{\pi}(S\_{t + 1}, A\_{t + 1})  \ | \ S\_t = s, A\_t = a, \pi]
+\end{aligned}}$$
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Рівняння Беллмана $v\_{\pi}$  
+
+.center.width-50[![](figures/lec4/vpiB.png)]
+
+$$v\_{\pi}(s) = \sum\_{a \in \mathcal{A}} \pi(a|s) q\_{\pi}(s, a)$$
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Рівняння Беллмана $q\_{\pi}$  
+
+.center.width-50[![](figures/lec4/qpiB.png)]
+
+$$q\_{\pi}(s, a) = \mathcal{R}^a\_{s} + \gamma \sum\_{s^\prime \in \mathcal{S}} \mathcal{P}^a\_{ss^\prime} v\_{\pi}(s^\prime)$$
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Рівняння Беллмана &mdash; 2  $v\_{\pi}$   
+
+.center.width-50[![](figures/lec4/vpiB2.png)]
+
+$$v\_{\pi}(s) = \sum\_{a \in \mathcal{A}} \pi(a|s) \left( \mathcal{R}^a\_{s} + \gamma \sum\_{s^\prime \in \mathcal{S}} \mathcal{P}^a\_{ss^\prime} v\_{\pi}(s^\prime) \right)$$
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Рівняння Беллмана &mdash; 2  $q\_{\pi}$  
+
+.center.width-50[![](figures/lec4/qpiB2.png)]
+
+$$q\_{\pi}(s, a) = \mathcal{R}^a\_{s} + \gamma \sum\_{s^\prime \in \mathcal{S}} \mathcal{P}^a\_{ss^\prime} \sum\_{a^\prime \in \mathcal{A}} \pi(a^\prime|s^\prime) q\_{\pi}(s^\prime, a^\prime)$$
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Приклад рівняння Беллмана для МППР 
+
+.center.width-70[![](figures/lec4/be.png)]
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+## Матрична форма рівняння Беллмана для МППР
+
+Рівняння Беллмана можна виразити у матричній формі:
+
+$$v\_\pi =\mathcal{R}^\pi +  \gamma \mathcal{P}^\pi v\_\pi ,$$
+
+де $v\_\pi$ &mdash; вектор-стовпець з одним записом для кожного стану. 
+
+
+$$\begin{aligned}
+\begin{bmatrix}
+v\_\pi(1) \\\\
+\vdots \\\\
+v\_\pi(n) 
+\end{bmatrix} 
+= \begin{bmatrix}
+\mathcal{R}^\pi\_1 \\\\
+\vdots \\\\
+\mathcal{R}^\pi\_n 
+\end{bmatrix}  + \gamma
+\begin{bmatrix}
+\mathcal{P}^\pi\_{11} & \cdots &  \mathcal{P}^\pi\_{1n}\\\\
+\vdots & & \\\\
+\mathcal{P}^\pi\_{n1} & \cdots &  \mathcal{P}^\pi\_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+v\_\pi(1) \\\\
+\vdots \\\\
+v\_\pi(n) 
+\end{bmatrix}
+\end{aligned}$$
+
+Точний розв'язок: 
+
+$$v\_\pi = (1 - \gamma \mathcal{P}^\pi)^{-1} \mathcal{R}^\pi$$
+
+
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
+
+---
+
+class: middle
+
+# Оптимальна функція цінності
+
+Оптимальна функція цінності $v\_\*(s)$ &mdash; це максимальне значення функції серед усіх стратегій:
+
+$$v\_\*(s) = \max\_\pi v\_\pi (s)$$
+
+Оптимальна Q-функція $q\_\*(s, a)$ &mdash; це максимальне значення функції серед усіх стратегій:
+
+$$q\_\*(s, a) = \max\_\pi q\_\pi (s, a)$$
+
+- Оптимальна функція цінності вказує на найкращу з можливих продуктивностей у МППР. 
+- МППР є ''вирішиним'', коли ми знаємо оптимальне значення функції цінності. 
 
 ---
 
 
 class: middle
 
-In Keras Conv2D layers, these parameters (*Size of the patches extracted from the inputs*, *Depth of the output feature map*) are the first arguments passed to the layer:
+# Приклад: оптимум $v\_\*(s)$
 
-- **Conv2D(output_depth, (window_height, window_width))**
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-A convolution works by sliding these windows of size 3×3 or 5×5 over the 3D input feature map, stopping at every possible location, and extracting the 3D patch of surrounding features **(shape (window_height, window_width, input_depth)).** Each such 3D patch is then transformed into a 1D vector of shape **(output_depth,)**, which is done via a tensor product with a learned weight matrix, called the convolution kernel &mdash; the same kernel is reused across every patch. All of these vectors (one per patch) are then spatially reassembled into a 3D output map of shape **(height, width, output_depth)** . Every spatial location in the output feature map corresponds to the same location in the input feature map (for example, the lower-right corner of the output contains information about the lower-right corner of the input).
-
----
+.center.width-70[![](figures/lec4/opv.png)]
 
 
-class: middle
-
-# How convolution works
-
-.smaller-xx[For instance, with 3×3 windows, the vector $output[i, j, :]$ comes from the 3D patch $input[i-1:i+1,
-j-1:j+1, :]$. The full process is detailed in figure below.]
-
-.center.width-55[![](figures/lec2/how_convolution_works.png)]
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Note that the output width and height may differ from the input width and height for two reasons:
-
-- *Border effects*, which can be countered by padding the input feature map
-- The use of *strides*
-
-Let’s take a deeper look at these notions.
-
----
-
-
-class: middle
-
-# Understanging border effects 
-
-## Valid locations of 3×3 patches in a 5×5 input feature map
-
-
-.center.width-90[![](figures/lec2/3x3_patches_in_5x5_input.png)]
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Consider a 5×5 feature map (25 tiles total). There are only 9 tiles around which you can center a 3×3 window, forming a 3×3 grid (see figure on this slide). Hence, the output feature map will be 3×3. It shrinks a little: by exactly two tiles alongside each dimension, in this case. You can see this border effect in action in the earlier example: you start with 28×28 inputs, which become 26×26 after the first convolution layer.
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
 class: middle
 
-# Understanging padding
+# Приклад: оптимум $q\_\*(s, a)$
 
-## Padding a 5×5 input in order to be able to extract 25 3×3 patches
-
-
-.center.width-90[![](figures/lec2/padding_of_5x5_input.png)]
+.center.width-70[![](figures/lec4/opq.png)]
 
 
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-If you want to get an output feature map with the same spatial dimensions as the input, you can use *padding*. Padding consists of adding an appropriate number of rows and columns on each side of the input feature map so as to make it possible to fit center convolution windows around every input tile. For a 3×3 window, you add one column on the right, one column on the left, one row at the top, and one row at the bottom. For a 5×5 window, you add two rows.
-
-In Conv2D layers, padding is configurable via the padding argument, which takes two values: *"valid"* , which means no padding (only valid window locations will be used), and *"same"*, which means “pad in such a way as to have an output with the same width and height as the input.” The padding argument defaults to *"valid"*.
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
-
 class: middle
 
-# Understanging convolution strides 
+# Оптимальна стратегія
 
-## 3×3 convolution patches with 2×2 strides
+Упорядкування стратегій:
 
+$\pi > \pi^\prime$ якщо $v\_\pi(s) > v\_\pi^\prime(s), \forall s$
 
-.center.width-90[![](figures/lec2/strides.png)]
+*Теорема.* Для будь-якого МППР
+- існує оптимальна стратегія $\pi\_\*$, яка краща або не гірша за інші стратегії: $\pi\_\* \geq \pi, \forall \pi$
+- усі оптимальні стратегії досягають оптимальної функції цінності: $v\_{\pi\_\*}(s) =  v\_{\*}(s)$
+- усі оптимальні стратегії досягають оптимального значення Q-функції: $q\_{\pi\_\*}(s, a) =  q\_{\*}(s, a)$
 
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-The other factor that can influence output size is the notion of *strides*. Our description of convolution so far has assumed that the center tiles of the convolution windows are all contiguous. But the distance between two successive windows is a parameter of the convolution, called its *stride*, which defaults to 1. It’s possible to have strided convolutions: convolutions with a stride higher than 1. In figure, you can see the patches extracted by a 3×3 convolution with stride 2 over a 5×5 input (without padding).
-
-Using stride 2 means the width and height of the feature map are downsampled by a factor of 2 (in addition to any changes induced by border effects). Strided convolutions are rarely used in classification models, but they come in handy for some types of models.
-
-In classification models, instead of strides, we tend to use the max-pooling operation to downsample feature maps, which you saw in action in our first convnet example. Let’s look at it in more depth.
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
-
 class: middle
 
-# Understanging max-pooling operation
+# Пошук оптимальної стратегії
 
-In the convnet example, you may have noticed that the size of the feature maps is halved after every MaxPooling2D layer. For instance, before the first *MaxPooling2D* layers, the feature map is 26×26, but the max-pooling operation halves it to 13×13. That’s the role of max pooling: to aggressively downsample feature maps, much like strided convolutions.
+Оптимальна стратегія може бути знайдена шляхом знаходження максимуму $q\_{\*}(s, a)$
 
-Max pooling consists of extracting windows from the input feature maps and outputting the max value of each channel. It’s conceptually similar to convolution,
-except that instead of transforming local patches via a learned linear transformation (the convolution kernel), they’re transformed via a hardcoded *max* tensor
-operation.
+$$\pi\_\*(a|s) = \begin{cases} 
+1, \; \text{if} \, a = arg\max\_{a \in \mathcal{A}} q\_{\*}(s, a) \\\\
+0, \; \text{else} 
+\end{cases} $$
 
-
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-In the convnet example, you may have noticed that the size of the feature maps is halved after every MaxPooling2D layer. For instance, before the first *MaxPooling2D* layers, the feature map is 26×26, but the max-pooling operation halves it to 13×13. That’s the role of max pooling: to aggressively downsample feature maps, much like strided convolutions.
-
-Max pooling consists of extracting windows from the input feature maps and outputting the max value of each channel. It’s conceptually similar to convolution,
-except that instead of transforming local patches via a learned linear transformation (the convolution kernel), they’re transformed via a hardcoded max tensor
-operation.
-
-A big difference from convolution is that *max pooling* is usually done with 2×2 windows and stride 2, in order to downsample the feature maps by a factor of 2. On the other hand, convolution is typically done with 3×3 windows and no stride (stride 1).
+- Для будь-якого МППР завжди існує детермінована оптимальна стратегія
+- Якщо відомо $q\_{\*}(s, a)$, ми одразу маємо оптимальну стратегію 
 
 ---
 
-
-
 class: middle
 
-## Understanging max-pooling operation 
+## Приклад: оптимальна стратегія для МППР
+
+.center.width-70[![](figures/lec4/opPi.png)]
 
 
-
-
-.center.width-80[![](figures/lec2/conv-without-maxpolling.png)]
-
-
-.footnote[Джерело: François Chollet. Deep Learning with Python, 2021.]
-
-???
-Why downsample feature maps this way? Why not remove the max-pooling layers and keep fairly large feature maps all the way up? Let’s look at this option. Our model would then look like the following listing.
-
-What’s wrong with this setup? Two things:
-
-- It isn’t conducive to learning a spatial hierarchy of features. The 3×3 windows in the third layer will only contain information coming from 7×7 windows in
-the initial input. The high-level patterns learned by the convnet will still be very small with regard to the initial input, which may not be enough to learn to classify digits (try recognizing a digit by only looking at it through windows that are 7×7 pixels!). We need the features from the last convolution layer to contain information about the totality of the input.
-
-- The final feature map has 22×22×128 = 61,952 total coefficients per sample. This is huge. When you flatten it to stick a Dense layer of size 10 on top, that
-layer would have over half a million parameters. This is far too large for such a small model and would result in intense overfitting.
-
-In short, the reason to use downsampling is to reduce the number of feature-map coefficients to process, as well as to induce spatial-filter hierarchies by making successive convolution layers look at increasingly large windows (in terms of the fraction of the original input they cover).
-
-
-Note that max pooling isn’t the only way you can achieve such downsampling. As you already know, you can also use strides in the prior convolution layer. And you can use average pooling instead of max pooling, where each local input patch is transformed by taking the average value of each channel over the patch, rather than the max. But max pooling tends to work better than these alternative solutions. The reason is that features tend to encode the spatial presence of some pattern or concept over the different tiles of the feature map (hence the term feature map), and it’s more informative to look at the maximal presence of different features than at their average presence.
-
-At this point, you should understand the basics of convnets &mdash; feature maps, convolution, and max pooling &mdash;  and you should know how to build a small convnet to solve a toy problem such as MNIST digits classification. 
+.footnote[Джерело слайду: [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf) [[video](https://www.youtube.com/watch?v=lfHX2hHRMVQ&list=PLqYmG7hTraZBiG_XpjnPrSNw-1XQaM_gB&index=3)], David Silver.]
 
 ---
 
 
 class: end-slide, center
-count: false
 
 .larger-xx[Кінець]
 
 ---
 
-count: false
 
 # Література
 
-- LeCun, Y., Bengio, Y., & Hinton, G. (2015). Deep learning. nature, 521(7553), 436-444.
+.smaller-x[
+- David Silver, [Lecture 2: Markov Decision Processes](https://www.davidsilver.uk/wp-content/uploads/2020/03/MDP.pdf)
+]

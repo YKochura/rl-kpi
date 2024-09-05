@@ -2,7 +2,7 @@ class: middle, center, title-slide
 
 # Навчання з підкріпленням
 
-Осінь, 2023
+Осінь, 2024
 
 <br><br>
 Кочура Юрій Петрович<br>
@@ -57,7 +57,7 @@ class: middle
 
 - Рівень володіння англійською мовою не нижче А2.
 - Базовi знання з лiнiйної алгебри та теорiї ймовiрностей.
-- Досвiд тренування глибинних мереж (iнiцiалiзацiя, оптимiзацiя, регуляризацiя, вибiр методу та метрик для оцiнки).
+- Досвiд тренування нейронних мереж (iнiцiалiзацiя, оптимiзацiя, регуляризацiя, вибiр методу та метрик для оцiнки).
 
 
 ---
@@ -89,8 +89,8 @@ class: middle
 ]
 
 .kol-1-2[
-.center.width-90[![](figures/course-details/telegram.png)]
-.center.smaller-x[Обговорення]
+.center.width-95[![](figures/course-details/telegram.png)]
+.center.smaller-x[Оголошення & Обговорення]
 ]
 ]
 
@@ -110,9 +110,9 @@ class: middle
 # Вебсторінка
 
 
-Усі навчальні матеріали будуть розміщуватись на цій вебсторінці:<br>  [https://courses-cs-kpi.github.io/rl-23fall/](https://courses-cs-kpi.github.io/rl-23fall/)
+Усі навчальні матеріали будуть розміщуватись на цій вебсторінці:<br>  [https://courses-cs-kpi.github.io/rl-24fall/](https://courses-cs-kpi.github.io/rl-24fall/)
 
-.center.width-80[![](figures/course-details/web.png)]
+.center.width-70[![](figures/course-details/web.png)]
 
 ---
 
@@ -194,13 +194,13 @@ class: middle
 class: middle
 # Система оцінювання
 
-- 30%  &nbsp;&emsp; Практичнi завдання (10% кожне)
-- 20%  &nbsp;&emsp; Семінар
-- 20%  &nbsp;&emsp; Проєкт
-- 30%  &nbsp;&emsp; Екзамен 
+- 30 бали  &nbsp;&emsp; Практичнi завдання (10 бали кожне)
+- 20 бали  &nbsp;&emsp; Семінар
+- 20 бали  &nbsp;&emsp; Проєкт
+- 30 бали  &nbsp;&emsp; Екзамен 
 
 **Примітка!** Умова допуску до семестрового контролю (екзамену):<br>
- .center[*Практичні + Семінар + Проєкт* $\geq 42\%$]
+ .center[*Практичні + Семінар + Проєкт* $\geq 42$ *бали*]
 
 ---
 

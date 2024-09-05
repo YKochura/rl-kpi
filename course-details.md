@@ -66,7 +66,7 @@ class: middle
 # Заняття
 
 - Лекції та практики в асинхронному режимі онлайн 
-- Семінар в синхронному режимі онлайн на платформі BigBlueButton:<br>  [https://bbb.comsys.kpi.ua/b/yur-juh-kwn-yuk](https://bbb.comsys.kpi.ua/b/yur-juh-kwn-yuk)
+- Семінар в синхронному режимі онлайн на платформі BigBlueButton:<br>  [https://bbb.ugrid.org/b/yur-juh-kwn-yuk](https://bbb.ugrid.org/b/yur-juh-kwn-yuk)
 
 .center.width-100[![](figures/course-details/bbb.png)]
 

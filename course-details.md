@@ -2,7 +2,7 @@ class: middle, center, title-slide
 
 # Навчання з підкріпленням
 
-Осінь, 2025
+Осінь, 2026
 
 <br><br>
 Кочура Юрій Петрович<br>
@@ -105,7 +105,7 @@ class: middle
 # Вебсторінка
 
 
-Усі навчальні матеріали будуть розміщуватись на цій вебсторінці:<br>  [https://courses-cs-kpi.github.io/rl-25fall/](https://courses-cs-kpi.github.io/rl-25fall/)
+Усі навчальні матеріали будуть розміщуватись на цій вебсторінці:<br>  [https://courses-cs-kpi.github.io/rl-26fall/](https://courses-cs-kpi.github.io/rl-26fall/)
 
 .center.width-70[![](figures/course-details/web.png)]
 

@@ -132,7 +132,7 @@ class: middle,
 ## Середовище [випадкового блукання](https://ru.wikipedia.org/wiki/%D0%A1%D0%BB%D1%83%D1%87%D0%B0%D0%B9%D0%BD%D0%BE%D0%B5_%D0%B1%D0%BB%D1%83%D0%B6%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5)
 
 .center[
-.width-90[![](figures/lec6/rw.png)]
+.width-90[![](figures/lec6/rw-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -189,7 +189,7 @@ class: middle
 ## Перше відвідування Монте-Карло (First-visit Monte Carlo, FVMC): покращення оцінок після кожного епізоду 
 
 .center[
-.width-100[![](figures/lec6/mc.png)]
+.width-100[![](figures/lec6/mc-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -275,7 +275,7 @@ class: middle,
 class: middle
 
 .center[
-.width-80[![](figures/lec6/Exponentially_decaying.png)]
+.width-80[![](figures/lec6/Exponentially_decaying-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -285,7 +285,7 @@ class: middle
 class: middle
 
 .center[
-.width-80[![](figures/lec6/trajectories.png)]
+.width-80[![](figures/lec6/trajectories-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -295,7 +295,7 @@ class: middle
 class: middle
 
 .center[
-.width-60[![](figures/lec6/mcPython1.png)]
+.width-60[![](figures/lec6/mcPython1-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -305,7 +305,7 @@ class: middle
 class: middle
 
 .center[
-.width-80[![](figures/lec6/mcPython2.png)]
+.width-80[![](figures/lec6/mcPython2-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -332,7 +332,7 @@ count: false
 class: middle
 
 .center[
-.width-100[![](figures/lec6/tAE.png)]
+.width-100[![](figures/lec6/tAE-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -342,7 +342,7 @@ class: middle
 class: middle
 
 .center[
-.width-100[![](figures/lec6/td.png)]
+.width-100[![](figures/lec6/td-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -383,7 +383,7 @@ $$R\_{t+1} +  \gamma V\_{t}(S\_{t+1})$$
 class: middle
 
 .center[
-.width-60[![](figures/lec6/tdMath.png)]
+.width-60[![](figures/lec6/tdMath-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -526,7 +526,7 @@ class: middle
 class: blue-slide, middle, center
 count: false
 
-.larger-xx[[Демо](https://github.com/YKochura/rl-kpi/blob/main/tutor/mf-prediction/RL_Model_Free_Prediction.ipynb)]
+.larger-xx[[Демо](https://colab.research.google.com/github/YKochura/rl-kpi/blob/main/tutor/mf-prediction/RL_Model_Free_Prediction.ipynb)]
 
 ---
 

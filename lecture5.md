@@ -40,7 +40,7 @@ count: false
 class: middle, 
 
 .center[
-.width-90[![](figures/lec7/hds.png)]
+.width-100[![](figures/lec7/hds-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales. p. 248]
@@ -59,7 +59,7 @@ class: middle,
 class: middle, 
 
 .center[
-.width-90[![](figures/lec7/css.png)]
+.width-100[![](figures/lec7/css-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -80,7 +80,7 @@ class: middle,
 class: middle, 
 
 .center[
-.width-70[![](figures/lec7/cart-pole.png)]
+.width-75[![](figures/lec7/cart-pole-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -118,13 +118,13 @@ class: middle,
 ## Апроксимація функцій має переваги 
 
 .center[
-.width-90[![](figures/lec7/svf.png)]
+.width-100[![](figures/lec7/svf-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
 
 ???
-Я сподіваюсь, ви зрозуміли, що в багатовимірних середовищах  або з неперервними простором станів немає щодних практичних причин, щоб  не використовувати апроксимацію функцій. Методи планування в RL представляють функції цінності за допомогою таблиць. Наприклад, методи ітерації за функцією цінності станів $v$  (value iteration),   які застосовуються у  MDP та знаходять оптимальну стратегію для такого MDP шляхом розрахунку оптимальної функції $v$. Ітеративний метод відстежує зміну функції $v$ протягом кількох ітерацій. Цей вектор зберігається у таблицю пошуку для запиту й оновлення оцінок.
+Я сподіваюсь, ви зрозуміли, що в багатовимірних середовищах  або з неперервними простором станів немає жодних практичних причин, щоб  не використовувати апроксимацію функцій. Методи планування в RL представляють функції цінності за допомогою таблиць. Наприклад, методи ітерації за функцією цінності станів $v$  (value iteration),   які застосовуються у  MDP та знаходять оптимальну стратегію для такого MDP шляхом розрахунку оптимальної функції $v$. Ітеративний метод відстежує зміну функції $v$ протягом кількох ітерацій. Цей вектор зберігається у таблицю пошуку для запиту й оновлення оцінок.
 
 1. Функція цінності індексується за станами. Повертає масив, що представляє собою набір значень загальної винагороди для кожного стану. 
 
@@ -135,7 +135,7 @@ class: middle,
 ## Апроксимація функцій має переваги 
 
 .center[
-.width-90[![](figures/lec7/avf.png)]
+.width-100[![](figures/lec7/avf-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -151,7 +151,7 @@ class: middle,
 <!-- ## Апроксимація функцій має переваги  -->
 
 .center[
-.width-70[![](figures/lec7/example.png)]
+.width-75[![](figures/lec7/example-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -180,11 +180,7 @@ class: middle,
 
 ## Апроксимація функцій має переваги 
 
-.center[
-.width-90[![](figures/lec7/add.png)]
-]
-
-.footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
+.alert[Наша мотивація використання апроксимації функцій полягає не лише в розв'язанні задач, які інакше неможливо розв'язати, але й у більш ефективному їх розв'язанні.]
 
 ???
 Мотивація використання апроксимації функцій полягає не лише у розв’язанні проблем, які неможливо розв’язати інакше, але й у розв’язанні проблем ефективніше.
@@ -193,11 +189,11 @@ class: middle,
 
 class: middle, 
 
-## First decision point: Selecting a value function to approximate
+## Перший вибір: яку функцію цінності апроксимувати
 
-- The state-value function $v(s)$
-- The action-value function $q(s,a)$
-- The action-advantage function $a(s,a) = q(s,a) - v(s)$
+- Функція цінності стану: $v(s)$
+- Функція цінності дії: $q(s,a)$
+- Функція переваги дії (action-advantage): $a(s,a) = q(s,a) - v(s)$
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
 
@@ -214,15 +210,15 @@ class: middle,
 
 class: middle, 
 
-## Which Function Approximator?
+## Який апроксиматор функції обрати?
 
-There are many function approximators, e.g.
+Існує багато апроксиматорів функцій, наприклад:
 
-- Linear combinations of features
-- Neural network
-- Decision tree
-- Nearest neighbour
-- Fourier / wavelet bases
+- Лінійні комбінації ознак
+- Нейронна мережа
+- Дерево рішень
+- Метод найближчого сусіда
+- Базиси Фур'є / вейвлетів
 - ...
 
 .footnote[Джерело: [David Silver](https://www.davidsilver.uk/wp-content/uploads/2020/03/FA.pdf).]
@@ -231,15 +227,15 @@ There are many function approximators, e.g.
 
 class: middle, 
 
-## Which Function Approximator?
+## Який апроксиматор функції обрати?
 
-We consider **differentiable** function approximators, e.g.
+Ми розглядаємо **диференційовні** апроксиматори функцій, наприклад:
 
-- **Linear combinations of features**
-- **Neural network**
-- Decision tree
-- Nearest neighbour
-- Fourier / wavelet bases
+- **Лінійні комбінації ознак**
+- **Нейронна мережа**
+- Дерево рішень
+- Метод найближчого сусіда
+- Базиси Фур'є / вейвлетів
 - ...
 
 .footnote[Джерело: [David Silver](https://www.davidsilver.uk/wp-content/uploads/2020/03/FA.pdf).]
@@ -248,10 +244,10 @@ We consider **differentiable** function approximators, e.g.
 
 class: middle, 
 
-## Second decision point: Selecting a neural network architecture
+## Другий вибір: яку архітектуру нейронної мережі обрати
 
 .center[
-.width-90[![](figures/lec7/saa.png)]
+.width-90[![](figures/lec7/saa-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -260,10 +256,10 @@ class: middle,
 
 class: middle, 
 
-## Second decision point: Selecting a neural network architecture
+## Другий вибір: яку архітектуру нейронної мережі обрати
 
 .center[
-.width-90[![](figures/lec7/sva.png)]
+.width-90[![](figures/lec7/sva-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -275,10 +271,10 @@ class: middle,
 
 class: middle, 
 
-## Third decision point: Selecting what to optimize
+## Третій вибір: що оптимізувати
 
 .center[
-.width-90[![](figures/lec7/so.png)]
+.width-90[![](figures/lec7/so-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -295,7 +291,7 @@ class: middle,
 class: middle, 
 
 .center[
-.width-90[![](figures/lec7/rem.png)]
+.width-100[![](figures/lec7/rem-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -306,7 +302,7 @@ class: middle,
 
 class: middle, 
 
-## Fourth decision point: Selecting the targets for policy evaluation
+## Четвертий вибір: що використовувати як цільові значення для оцінки стратегії
 
 .center[
 .width-90[![](figures/lec7/sp.png)]
@@ -322,10 +318,9 @@ class: middle,
 
 class: middle, 
 
-## Fifth decision point: Selecting an exploration strategy
+## П'ятий вибір: стратегія дослідження
 
-Another thing we need to decide is which policy improvement step to use for our generalized
-policy iteration needs.
+Ще одне, що нам потрібно вирішити, який крок покращення стратегії використовувати в нашій узагальненій ітерації стратегії.
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
 
@@ -338,7 +333,7 @@ simple, we’re going to use an epsilon-greedy strategy on our NFQ implementatio
 class: middle, 
 
 .center[
-.width-90[![](figures/lec7/eg.png)]
+.width-90[![](figures/lec7/eg-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -354,7 +349,7 @@ class: middle,
 
 class: middle, 
 
-## Sixth decision point: Selecting a loss function
+## Шостий вибір: яку функцію втрат обрати
 
 - L1
 - L2, MSE
@@ -371,12 +366,12 @@ class: middle,
 
 class: middle, 
 
-## Seventh decision point: Selecting an optimization method
+## ## Сьомий вибір: який метод оптимізації обрати
 
-- Batch gradient descent
-- Mini-batch gradient descent
-- Stochastic gradient descent
-- Mini-batch gradient descent vs. momentum
+- Пакетний градієнтний спуск
+- Міні-пакетний градієнтний спуск
+- Стохастичний градієнтний спуск
+- Міні-пакетний градієнтний спуск vs з імпульсом
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
  
@@ -438,7 +433,7 @@ class: middle,
 class: middle,
 
 .center[
-.width-90[![](figures/lec7/sum.png)]
+.width-100[![](figures/lec7/sum-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -452,7 +447,7 @@ NFQ був представлений у 2005 році Мартіном Рідм
 class: middle,
 
 .center[
-.width-90[![](figures/lec7/sum2.png)]
+.width-100[![](figures/lec7/sum2-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -464,7 +459,7 @@ class: middle,
 class: middle,
 
 .center[
-.width-70[![](figures/lec7/results.png)]
+.width-70[![](figures/lec7/results-ua.png)]
 ]
 
 .footnote[Джерело: Grokking Deep Reinforcement Learning, Miguel Morales.]
@@ -483,7 +478,7 @@ class: middle,
 class:  middle, center
 count: false
 
-.larger-xx[[Демо](https://github.com/YKochura/rl-kpi/blob/main/tutor/nfq/nfq-s.ipynb)]
+.larger-xx[[Демо](https://colab.research.google.com/github/YKochura/rl-kpi/blob/main/tutor/nfq/nfq-s.ipynb)]
 
 ---
 
